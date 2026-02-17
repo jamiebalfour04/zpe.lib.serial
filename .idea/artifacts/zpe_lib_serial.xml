@@ -1,9 +1,9 @@
 <component name="ArtifactManager">
   <artifact type="jar" build-on-make="true" name="zpe.lib.serial">
-    <output-path>$USER_HOME$/Dropbox/Programs/JARs</output-path>
+    <output-path>$PROJECT_DIR$/build</output-path>
     <root id="archive" name="zpe.lib.serial.jar">
       <element id="module-output" name="zpe.lib.serial" />
-      <element id="extracted-dir" path="$USER_HOME$/Dropbox/Programs/JARs/jSerialComm-2.5.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Sync/Programs/JARs/jSerialComm-2.5.3.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>
