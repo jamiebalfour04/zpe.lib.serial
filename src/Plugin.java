@@ -1,5 +1,4 @@
 import com.fazecast.jSerialComm.SerialPort;
-import jamiebalfour.generic.BinarySearchTree;
 import jamiebalfour.zpe.core.YASSByteCodes;
 import jamiebalfour.zpe.core.ZPEFunction;
 import jamiebalfour.zpe.core.ZPERuntimeEnvironment;
@@ -27,6 +26,21 @@ public class Plugin implements ZPELibrary {
   }
 
   @Override
+  public boolean supportsWindows() {
+    return true;
+  }
+
+  @Override
+  public boolean supportsMacOs() {
+    return true;
+  }
+
+  @Override
+  public boolean supportsLinux() {
+    return true;
+  }
+
+  @Override
   public String getName() {
     return "libSerial";
   }
@@ -40,19 +54,16 @@ public class Plugin implements ZPELibrary {
 
     @Override
     public String getManualEntry() {
-      // TODO Auto-generated method stub
-      return null;
+      return "Returns a list of all serial ports available on the system.";
     }
 
     @Override
     public String getManualHeader() {
-      // TODO Auto-generated method stub
-      return null;
+      return "list_serial_ports()";
     }
 
     @Override
     public int getMinimumParameters() {
-      // TODO Auto-generated method stub
       return 0;
     }
 
@@ -66,7 +77,7 @@ public class Plugin implements ZPELibrary {
       SerialPort[] ports = SerialPort.getCommPorts();
       ZPEList output = new ZPEList();
       for (SerialPort p : ports) {
-        //Add all ports to list
+        //Add all ports to the list
         ZPESerialPort port = new ZPESerialPort(zpeRuntimeEnvironment, zpeFunction, "ZPESerialPort");
         port.p = p;
         output.add(port);
@@ -77,7 +88,6 @@ public class Plugin implements ZPELibrary {
 
     @Override
     public int getRequiredPermissionLevel() {
-      // TODO Auto-generated method stub
       return 0;
     }
 
