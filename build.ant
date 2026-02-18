@@ -1,0 +1,11 @@
+<project name="build" default="build" basedir=".">
+
+    <property name="scripts.dir" value="${user.home}/Sync/Scripts"/>
+
+    <target name="build">
+        <exec executable="sh" failonerror="true" dir="${basedir}">
+            <arg value="${scripts.dir}/publish_libraries"/>
+        </exec>
+    </target>
+
+</project>
