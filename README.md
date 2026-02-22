@@ -42,6 +42,8 @@ This library was among the first I developed for ZPE, but it fell into disrepair
 
 <pre>
 
+import "zpe.lib.serial"
+
 ports = list_serial_ports()
 
 for (p in ports)
