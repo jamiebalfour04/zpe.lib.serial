@@ -3,6 +3,7 @@ import java.util.HashMap;
 import com.fazecast.jSerialComm.SerialPort;
 
 import jamiebalfour.generic.JBBinarySearchTree;
+import jamiebalfour.zpe.core.YASSByteCodes;
 import jamiebalfour.zpe.core.ZPERuntimeEnvironment;
 import jamiebalfour.zpe.core.ZPEObject;
 import jamiebalfour.zpe.core.ZPEStructure;
@@ -51,6 +52,11 @@ public class ZPESerialPort extends ZPEStructure {
       return "get_name";
     }
 
+    @Override
+    public byte[] returnTypes() {
+      return new byte[]{YASSByteCodes.STRING_TYPE};
+    }
+
   }
 
   public class is_open_Command implements jamiebalfour.zpe.interfaces.ZPEObjectNativeMethod {
@@ -78,6 +84,11 @@ public class ZPESerialPort extends ZPEStructure {
     @Override
     public String getName() {
       return "is_open";
+    }
+
+    @Override
+    public byte[] returnTypes() {
+      return new byte[]{YASSByteCodes.BOOLEAN_TYPE};
     }
 
   }
@@ -109,6 +120,12 @@ public class ZPESerialPort extends ZPEStructure {
       return "open";
     }
 
+    @Override
+    public byte[] returnTypes() {
+      return new byte[]{YASSByteCodes.BOOLEAN_TYPE};
+    }
+
+
   }
 
   public class write_Command implements jamiebalfour.zpe.interfaces.ZPEObjectNativeMethod {
@@ -120,7 +137,7 @@ public class ZPESerialPort extends ZPEStructure {
       p.setComPortTimeouts(SerialPort.TIMEOUT_SCANNER, 0, 0);
       p.writeBytes(new byte[] {b}, 1);
       p.closePort();
-      return null;
+      return parent;
     }
 
     @Override
@@ -141,6 +158,11 @@ public class ZPESerialPort extends ZPEStructure {
     @Override
     public String getName() {
       return "write";
+    }
+
+    @Override
+    public byte[] returnTypes() {
+      return new byte[]{YASSByteCodes.OBJECT_TYPE};
     }
 
   }
