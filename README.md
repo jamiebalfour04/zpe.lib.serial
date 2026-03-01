@@ -47,12 +47,12 @@ import "zpe.lib.serial"
 ports = list_serial_ports()
 
 for (p in ports)
-    print(p.get_name())
+    print(p->get_name())
 end for
 
 port = ports[0]
-port.open()
-port.write()
+port->open()
+port->write()
 </pre>
 
 <h2>Notes</h2>
