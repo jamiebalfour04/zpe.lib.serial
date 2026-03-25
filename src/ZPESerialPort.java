@@ -7,10 +7,10 @@ import jamiebalfour.zpe.core.YASSByteCodes;
 import jamiebalfour.zpe.core.ZPERuntimeEnvironment;
 import jamiebalfour.zpe.core.ZPEObject;
 import jamiebalfour.zpe.core.ZPEStructure;
-import jamiebalfour.zpe.interfaces.ZPEPropertyWrapper;
-import jamiebalfour.zpe.interfaces.ZPEType;
-import jamiebalfour.zpe.types.ZPEBoolean;
-import jamiebalfour.zpe.types.ZPEString;
+import jamiebalfour.zpe.core.interfaces.ZPEPropertyWrapper;
+import jamiebalfour.zpe.core.interfaces.ZPEType;
+import jamiebalfour.zpe.core.types.ZPEBoolean;
+import jamiebalfour.zpe.core.types.ZPEString;
 
 public class ZPESerialPort extends ZPEStructure {
 
@@ -25,7 +25,7 @@ public class ZPESerialPort extends ZPEStructure {
     addNativeMethod("write", new write_Command());
   }
 
-  public class get_name_Command implements jamiebalfour.zpe.interfaces.ZPEObjectNativeMethod {
+  public class get_name_Command implements jamiebalfour.zpe.core.interfaces.ZPEObjectNativeMethod {
 
     @Override
     public ZPEType MainMethod(JBBinarySearchTree<String, ZPEType> parameters, ZPEObject parent) {
@@ -59,7 +59,7 @@ public class ZPESerialPort extends ZPEStructure {
 
   }
 
-  public class is_open_Command implements jamiebalfour.zpe.interfaces.ZPEObjectNativeMethod {
+  public class is_open_Command implements jamiebalfour.zpe.core.interfaces.ZPEObjectNativeMethod {
 
     @Override
     public ZPEType MainMethod(JBBinarySearchTree<String, ZPEType> parameters, ZPEObject parent) {
@@ -93,7 +93,7 @@ public class ZPESerialPort extends ZPEStructure {
 
   }
 
-  public class open_Command implements jamiebalfour.zpe.interfaces.ZPEObjectNativeMethod {
+  public class open_Command implements jamiebalfour.zpe.core.interfaces.ZPEObjectNativeMethod {
 
     @Override
     public ZPEType MainMethod(JBBinarySearchTree<String, ZPEType> parameters, ZPEObject parent) {
@@ -128,7 +128,7 @@ public class ZPESerialPort extends ZPEStructure {
 
   }
 
-  public class write_Command implements jamiebalfour.zpe.interfaces.ZPEObjectNativeMethod {
+  public class write_Command implements jamiebalfour.zpe.core.interfaces.ZPEObjectNativeMethod {
 
     @Override
     public ZPEType MainMethod(JBBinarySearchTree<String, ZPEType> parameters, ZPEObject parent) {
