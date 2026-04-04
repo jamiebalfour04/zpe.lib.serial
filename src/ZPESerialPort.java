@@ -28,7 +28,7 @@ public class ZPESerialPort extends ZPEStructure {
   public class get_name_Command implements jamiebalfour.zpe.core.interfaces.ZPEObjectNativeMethod {
 
     @Override
-    public ZPEType MainMethod(JBBinarySearchTree<String, ZPEType> parameters, ZPEObject parent) {
+    public ZPEType run(HashMap<String, ZPEType> parameters, ZPEObject parent) {
       return new ZPEString(p.getDescriptivePortName());
     }
 
@@ -62,7 +62,7 @@ public class ZPESerialPort extends ZPEStructure {
   public class is_open_Command implements jamiebalfour.zpe.core.interfaces.ZPEObjectNativeMethod {
 
     @Override
-    public ZPEType MainMethod(JBBinarySearchTree<String, ZPEType> parameters, ZPEObject parent) {
+    public ZPEType run(HashMap<String, ZPEType> parameters, ZPEObject parent) {
       return new ZPEBoolean(p.isOpen());
     }
 
@@ -96,7 +96,7 @@ public class ZPESerialPort extends ZPEStructure {
   public class open_Command implements jamiebalfour.zpe.core.interfaces.ZPEObjectNativeMethod {
 
     @Override
-    public ZPEType MainMethod(JBBinarySearchTree<String, ZPEType> parameters, ZPEObject parent) {
+    public ZPEType run(HashMap<String, ZPEType> parameters, ZPEObject parent) {
       return new ZPEBoolean(p.openPort());
     }
 
@@ -131,7 +131,7 @@ public class ZPESerialPort extends ZPEStructure {
   public class write_Command implements jamiebalfour.zpe.core.interfaces.ZPEObjectNativeMethod {
 
     @Override
-    public ZPEType MainMethod(JBBinarySearchTree<String, ZPEType> parameters, ZPEObject parent) {
+    public ZPEType run(HashMap<String, ZPEType> parameters, ZPEObject parent) {
       byte b = (byte) 3072;
       p.setBaudRate(19200);
       p.setComPortTimeouts(SerialPort.TIMEOUT_SCANNER, 0, 0);
