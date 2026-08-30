@@ -1,63 +1,57 @@
-<h1>zpe.lib.serial</h1>
+# zpe.lib.serial
 
-<p>
-  This is the official Serial Port plugin for ZPE.
-</p>
+The official serial-port plugin for ZPE and ZPEX, using
+[jSerialComm](https://fazecast.github.io/jSerialComm/) internally.
 
-This library was among the first I developed for ZPE, but it fell into disrepair.
-<p align="center">
-  <img src="https://www.computerhope.com/jargon/s/serial-port.jpg" alt="A serial port" width="300">
-</p>
+The project uses jSerialComm 2.11.4, including its native Apple Silicon
+library. Older releases such as 2.5.3 contain only Intel macOS binaries and
+cannot be loaded by an ARM64 ZPEX plugin.
 
-<p>
-  The plugin provides support for listing, opening and writing to serial ports.
-</p>
+## ZPE installation
 
-<h2>Installation</h2>
+Build the existing JAR and install it into `plugins`. This retains the
+classic `list_serial_ports()` API for the JVM version of ZPE.
 
-<p>
-  Place <strong>zpe.lib.serial.jar</strong> in your ZPE native-plugins folder and restart ZPE.
-</p>
+## ZPEX native plugin
 
-<p>
-  You can also download with the ZULE Package Manager by using:
-</p>
-<p>
-  <code>zpe --zule install zpe.lib.serial.jar</code>
-</p>
+The repository also contains an independent GraalVM adapter. It compiles the
+Java serial implementation and jSerialComm into a platform-specific shared
+library, without embedding or linking the ZPE runtime itself.
 
-<h2>Documentation</h2>
+Set `GRAAL_HOME` to a GraalVM containing Native Image, then run:
 
-<p>
-  Full documentation, examples and API reference are available here:
-</p>
+```console
+./build-native.sh
+```
 
-<p>
-  <a href="https://www.jamiebalfour.scot/projects/zpe/documentation/plugins/zpe.lib.serial/" target="_blank">
-    View the complete documentation
-  </a>
-</p>
+If jSerialComm is stored elsewhere, set `JSERIALCOMM_JAR` to its full path.
+The output is written beneath `build/native`. Install the resulting `.dylib`,
+`.so` or `.dll` with:
 
-<h2>Example</h2>
+```console
+zpe --plugins add build/native/zpe.lib.serial.dylib
+```
 
-<pre>
+The native plugin exposes:
 
-import "zpe.lib.serial"
+- `SerialManager`: `refresh()`, `port_count()` and `get_port(index)`;
+- `SerialPort`: readable `system_name` and `name` properties;
+- writable `baud_rate`;
+- `open()`, `close()`, `bytes_available()`, `write(text)` and
+  `read(maximum_bytes)` methods, plus the legacy `get_name()` and `is_open()`
+  methods.
 
-ports = list_serial_ports()
+See `examples/native_serial.yas` for a discovery example. Hardware access may
+still require the appropriate operating-system permissions.
 
-for (p in ports)
-    print(p->get_name())
-end for
+Both builds are imported with `import "zpe.lib.serial"`. ZPE searches
+`plugins` for `zpe.lib.serial.jar`; ZPEX searches only `native-plugins` for
+`zpe.lib.serial.dylib` (or the matching Linux/Windows filename).
 
-port = ports[0]
-port->open()
-port->write()
-</pre>
+The native library is specific to an operating system and CPU architecture.
+Build and distribute one copy for each supported target.
 
-<h2>Notes</h2>
-
-<ul>
-  <li>Uses jSerialComm internally.</li>
-  <li>Requires permission level 3 for port operations.</li>
-</ul>
+The Native Image build includes explicit JNI reachability metadata for
+`SerialPort`. jSerialComm's native code locates that class, its constructor and
+its fields through JNI at runtime; Native Image would otherwise remove the
+lookup metadata even though the Java class itself remains reachable.

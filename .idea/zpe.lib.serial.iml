@@ -8,6 +8,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="zpe" level="project" />
-    <orderEntry type="library" name="jSerialComm-2.5.3" level="project" />
+    <orderEntry type="library" name="jSerialComm-2.11.4" level="project" />
   </component>
 </module>

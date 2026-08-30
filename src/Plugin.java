@@ -2,11 +2,13 @@ import com.fazecast.jSerialComm.SerialPort;
 import jamiebalfour.zpe.core.*;
 import jamiebalfour.zpe.core.interfaces.ZPECustomFunction;
 import jamiebalfour.zpe.core.interfaces.ZPELibrary;
+import jamiebalfour.zpe.core.interfaces.ZPEPropertyWrapper;
 import jamiebalfour.zpe.core.interfaces.ZPEType;
 import jamiebalfour.zpe.core.types.ZPEList;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 public class Plugin implements ZPELibrary {
 
@@ -18,7 +20,7 @@ public class Plugin implements ZPELibrary {
   }
 
   @Override
-  public Map<String, Class<? extends ZPEStructure>> getObjects() {
+  public Map<String, BiFunction<ZPERuntimeEnvironment, ZPEPropertyWrapper, ZPEObject>>getObjects() {
     return null;
   }
 
@@ -80,7 +82,7 @@ public class Plugin implements ZPELibrary {
       ZPEList output = new ZPEList();
       for (SerialPort p : ports) {
         //Add all ports to the list
-        ZPESerialPort port = new ZPESerialPort(zpeRuntimeEnvironment, zpeFunction, "ZPESerialPort");
+        ZPESerialPort port = new ZPESerialPort(zpeRuntimeEnvironment, zpeFunction, "SerialPort");
         port.p = p;
         output.add(port);
       }

@@ -1,0 +1,10 @@
+import "zpe.lib.serial"
+
+$serial = new SerialManager()
+$count = $serial->port_count()
+print(`Found {{$count}} serial port(s).`)
+
+for ($i = 0; $i < $count; $i++)
+  $port = $serial->get_port($i)
+  print(`{{$i}}: {{$port->name}} [{{$port->system_name}}]`)
+end for
