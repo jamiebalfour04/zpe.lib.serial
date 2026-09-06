@@ -1,0 +1,164 @@
+name: Build native ZPEX plugin
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  jar:
+    name: JVM plugin JAR
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Check out zpe.lib.serial
+        uses: actions/checkout@v5
+
+      - name: Verify JVM plugin JAR
+        run: |
+          test -f build/zpe.lib.serial.jar
+          unzip -tq build/zpe.lib.serial.jar
+
+      - name: Upload JVM plugin
+        uses: actions/upload-artifact@v4
+        with:
+          name: zpe-lib-serial-jvm
+          path: build/zpe.lib.serial.jar
+          if-no-files-found: error
+          retention-days: 30
+
+  build:
+    name: ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS ARM64 dylib
+            os: macos-14
+            artifact: zpe-lib-serial-macos-arm64
+            output: build/native/zpe.lib.serial.dylib
+          - name: Windows x64 DLL
+            os: windows-2022
+            artifact: zpe-lib-serial-windows-x64
+            output: build/native/zpe.lib.serial.dll
+          - name: Linux x64 shared library
+            os: ubuntu-24.04
+            artifact: zpe-lib-serial-linux-x64
+            output: build/native/zpe.lib.serial.so
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Check out zpe.lib.serial
+        uses: actions/checkout@v5
+
+      - name: Set up GraalVM Native Image
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: "25"
+          distribution: graalvm-community
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          native-image-job-reports: "true"
+
+      - name: Enable the MSVC x64 toolchain
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          & "${env:ProgramFiles}\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\Launch-VsDevShell.ps1" -Arch amd64 -HostArch amd64
+          "PATH=$env:PATH" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "INCLUDE=$env:INCLUDE" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "LIB=$env:LIB" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "LIBPATH=$env:LIBPATH" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Build native serial plugin
+        shell: bash
+        run: ./build-native.sh
+
+      - name: Verify native plugin
+        shell: bash
+        run: test -f "${{ matrix.output }}"
+
+      - name: Upload native plugin
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.output }}
+          if-no-files-found: error
+          retention-days: 30
+
+  package:
+    name: Package and deploy zpe.lib.serial.zip
+    needs:
+      - jar
+      - build
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Check out zpe.lib.serial
+        uses: actions/checkout@v5
+
+      - name: Download JVM plugin
+        uses: actions/download-artifact@v5
+        with:
+          name: zpe-lib-serial-jvm
+          path: release/zpe.lib.serial
+
+      - name: Download macOS plugin
+        uses: actions/download-artifact@v5
+        with:
+          name: zpe-lib-serial-macos-arm64
+          path: release/zpe.lib.serial/native/macos-arm64
+
+      - name: Download Windows plugin
+        uses: actions/download-artifact@v5
+        with:
+          name: zpe-lib-serial-windows-x64
+          path: release/zpe.lib.serial/native/windows-x64
+
+      - name: Download Linux plugin
+        uses: actions/download-artifact@v5
+        with:
+          name: zpe-lib-serial-linux-x64
+          path: release/zpe.lib.serial/native/linux-x64
+
+      - name: Assemble zpe.lib.serial.zip
+        run: |
+          cp README.md LICENSE release/zpe.lib.serial/
+          cd release
+          zip -9 -r zpe.lib.serial.zip zpe.lib.serial
+          unzip -l zpe.lib.serial.zip
+
+      - name: Upload zpe.lib.serial.zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: zpe.lib.serial
+          path: release/zpe.lib.serial.zip
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Deploy zpe.lib.serial.zip with rsync
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_PRIVATE_KEY: ${{ secrets.SFTP_PRIVATE_KEY }}
+          SFTP_HOST_KEY: ${{ secrets.SFTP_HOST_KEY }}
+          SFTP_DESTINATION: ${{ secrets.SFTP_DESTINATION_SERIAL }}
+        run: |
+          test -n "$SFTP_HOST"
+          test -n "$SFTP_USERNAME"
+          test -n "$SFTP_PRIVATE_KEY"
+          test -n "$SFTP_HOST_KEY"
+          test -n "$SFTP_DESTINATION"
+          port="${SFTP_PORT:-22}"
+          install -d -m 700 "$HOME/.ssh"
+          printf '%b\n' "$SFTP_PRIVATE_KEY" | tr -d '\r' > "$HOME/.ssh/serial_deploy"
+          printf '%b\n' "$SFTP_HOST_KEY" | tr -d '\r' > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/serial_deploy" "$HOME/.ssh/known_hosts"
+          if ! ssh-keygen -y -P "" -f "$HOME/.ssh/serial_deploy" > /dev/null; then
+            echo "::error::SFTP_PRIVATE_KEY is invalid or passphrase-protected."
+            exit 1
+          fi
+          rsync -az --progress \
+            -e "ssh -p $port -i $HOME/.ssh/serial_deploy -o IdentitiesOnly=yes" \
+            release/zpe.lib.serial.zip \
+            "$SFTP_USERNAME@$SFTP_HOST:$SFTP_DESTINATION"

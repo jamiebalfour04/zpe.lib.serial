@@ -48,6 +48,14 @@ Both builds are imported with `import "zpe.lib.serial"`. ZPE searches
 `plugins` for `zpe.lib.serial.jar`; ZPEX searches only `native-plugins` for
 `zpe.lib.serial.dylib` (or the matching Linux/Windows filename).
 
+## Distribution package
+
+Every push runs the GitHub Actions workflow and produces `zpe.lib.serial.zip`.
+The archive contains the JVM plugin and the macOS ARM64, Windows x64 and Linux
+x64 ZPEX plugins. The workflow uploads the archive as a build artifact and
+deploys it with rsync when the `SFTP_DESTINATION_SERIAL` repository secret is
+configured.
+
 The native library is specific to an operating system and CPU architecture.
 Build and distribute one copy for each supported target.
 
