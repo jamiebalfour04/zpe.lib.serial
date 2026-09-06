@@ -41,7 +41,7 @@ mkdir -p "$BUILD_DIR/classes"
   -H:Path="$BUILD_DIR" \
   -H:Name=zpe.lib.serial \
   -H:JNIConfigurationFiles=native-config/jni-config.json \
-  -H:IncludeResources='(OSX|Linux|Windows)/.*' \
+  -H:IncludeResources='.*' \
   -H:-UnlockExperimentalVMOptions \
   SerialNativePlugin
 
