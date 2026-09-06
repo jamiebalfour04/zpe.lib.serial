@@ -35,6 +35,7 @@ fi
 mkdir -p "$BUILD_DIR/classes"
 "$JAVAC" -cp "$JSERIALCOMM_JAR" -d "$BUILD_DIR/classes" native-src/SerialNativePlugin.java
 "$NATIVE_IMAGE" --shared --no-fallback --enable-native-access=ALL-UNNAMED \
+  --initialize-at-run-time=com.fazecast.jSerialComm \
   -cp "$BUILD_DIR/classes$CP_SEPARATOR$JSERIALCOMM_JAR" \
   -H:+UnlockExperimentalVMOptions \
   -H:Path="$BUILD_DIR" \
@@ -46,11 +47,15 @@ mkdir -p "$BUILD_DIR/classes"
 
 case "$PLATFORM" in
   Darwin)
-    mv "$BUILD_DIR/libzpe.lib.serial.dylib" "$BUILD_DIR/zpe.lib.serial.dylib"
+    if [ -f "$BUILD_DIR/libzpe.lib.serial.dylib" ]; then
+      mv "$BUILD_DIR/libzpe.lib.serial.dylib" "$BUILD_DIR/zpe.lib.serial.dylib"
+    fi
     OUTPUT="$BUILD_DIR/zpe.lib.serial.dylib"
     ;;
   Linux)
-    mv "$BUILD_DIR/libzpe.lib.serial.so" "$BUILD_DIR/zpe.lib.serial.so"
+    if [ -f "$BUILD_DIR/libzpe.lib.serial.so" ]; then
+      mv "$BUILD_DIR/libzpe.lib.serial.so" "$BUILD_DIR/zpe.lib.serial.so"
+    fi
     OUTPUT="$BUILD_DIR/zpe.lib.serial.so"
     ;;
   MINGW*|MSYS*|CYGWIN*) OUTPUT="$BUILD_DIR/zpe.lib.serial.dll" ;;
